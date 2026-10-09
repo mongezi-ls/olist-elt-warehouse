@@ -1,0 +1,13 @@
+@"
+.venv/
+__pycache__/
+*.pyc
+.env
+profiles.yml
+dbt_packages/
+logs/
+target/
+dbt_modules/
+.airflow/
+.DS_Store
+"@ | Out-File -Encoding utf8 .gitignore
