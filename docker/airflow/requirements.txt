@@ -1,0 +1,13 @@
+# Databricks
+dbt-databricks==1.8.4
+
+# Ingestion
+pandas==2.1.4
+requests==2.32.3
+pyodbc==5.1.0
+SQLAlchemy==1.4.52
+python-dotenv==1.0.1
+
+# Airflow providers (MSSQL only — no Databricks provider)
+apache-airflow-providers-microsoft-mssql==3.7.0
+apache-airflow-providers-common-sql==1.15.0
