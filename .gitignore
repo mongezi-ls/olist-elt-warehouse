@@ -10,4 +10,12 @@ target/
 dbt_modules/
 .airflow/
 .DS_Store
+
+# Data files (too large for git)
+data/raw/*.csv
+data/raw/*.zip
+data/processed/
+
+# Docker
+*.log
 "@ | Out-File -Encoding utf8 .gitignore
