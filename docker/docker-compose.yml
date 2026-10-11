@@ -22,6 +22,7 @@ x-airflow-common: &airflow-common
     - ../airflow/plugins:/opt/airflow/plugins
     - ../ingestion:/opt/airflow/ingestion
     - ../dbt_olist:/opt/airflow/dbt_olist
+    - ../data:/opt/airflow/data
   depends_on:
     postgres:
       condition: service_healthy
