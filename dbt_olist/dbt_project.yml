@@ -1,0 +1,45 @@
+name: 'dbt_olist'
+version: '1.0.0'
+config-version: 2
+
+# Profile name — must match profiles.yml
+profile: 'dbt_olist'
+
+# Folder paths
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# Where to write compiled artifacts
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model configurations
+models:
+  dbt_olist:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts
+
+# Snapshot configurations
+models:
+  dbt_olist:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts
+
+snapshots:
+  dbt_olist:
+    +target_schema: snapshots
+    +strategy: timestamp

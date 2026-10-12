@@ -18,4 +18,8 @@ data/processed/
 
 # Docker
 *.log
+
+# dbt
+dbt_olist/.user.yml
+dbt_olist/package-lock.yml
 "@ | Out-File -Encoding utf8 .gitignore

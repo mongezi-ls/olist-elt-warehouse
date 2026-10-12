@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Raw Olist data landed from MSSQL and external APIs."
+    database: olist
+    schema: bronze
+    tables:
+      - name: customers
+        description: "One row per customer per order."
+      - name: geolocation
+        description: "ZIP code to lat/lng lookup."
+      - name: orders
+        description: "Order header with status and timestamps."
+      - name: order_items
+        description: "Line items per order."
+      - name: order_payments
+        description: "Payments applied to orders."
+      - name: order_reviews
+        description: "Customer reviews per order."
+      - name: products
+        description: "Product catalog."
+      - name: sellers
+        description: "Seller catalog."
+      - name: product_category_name_translation
+        description: "Portuguese to English category names."
+      - name: exchange_rates_raw
+        description: "Daily currency exchange rates (append-only)."

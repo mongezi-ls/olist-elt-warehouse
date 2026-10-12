@@ -1,0 +1,111 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Cleaned customer data. One row per customer per order."
+    columns:
+      - name: customer_id
+        data_tests:
+          - not_null
+      - name: customer_unique_id
+        data_tests:
+          - not_null
+
+  - name: stg_orders
+    description: "Cleaned order headers. One row per order."
+    columns:
+      - name: order_id
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        data_tests:
+          - not_null
+      - name: order_status
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['created', 'approved', 'invoiced', 'processing', 'shipped', 'delivered', 'unavailable', 'canceled']
+
+  - name: stg_order_items
+    description: "Order line items. One row per item per order."
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+      - name: order_item_id
+        data_tests:
+          - not_null
+      - name: product_id
+        data_tests:
+          - not_null
+      - name: seller_id
+        data_tests:
+          - not_null
+
+  - name: stg_order_payments
+    description: "Payments per order. One row per payment."
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+      - name: payment_type
+        data_tests:
+          - not_null
+
+  - name: stg_order_reviews
+    description: "Order reviews. One row per review."
+    columns:
+      - name: review_id
+        data_tests:
+          - unique
+          - not_null
+      - name: order_id
+        data_tests:
+          - not_null
+      - name: review_score
+        data_tests:
+          - not_null
+
+  - name: stg_products
+    description: "Product catalog. One row per product."
+    columns:
+      - name: product_id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_sellers
+    description: "Seller catalog. One row per seller."
+    columns:
+      - name: seller_id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_product_category_translation
+    description: "Category name translations."
+    columns:
+      - name: category_name_pt
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_geolocation
+    description: "Geolocation lookup. Not unique per ZIP (multiple lat/lng per ZIP)."
+
+  - name: stg_exchange_rates
+    description: "Deduplicated exchange rates. One row per (base, date, target)."
+    columns:
+      - name: base_currency
+        data_tests:
+          - not_null
+      - name: target_currency
+        data_tests:
+          - not_null
+      - name: rate_date
+        data_tests:
+          - not_null
+      - name: exchange_rate
+        data_tests:
+          - not_null
