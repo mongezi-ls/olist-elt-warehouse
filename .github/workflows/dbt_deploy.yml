@@ -33,16 +33,25 @@ jobs:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: dbt deps
 
-      - name: dbt build (run + test all models)
+      - name: dbt run (build all models)
         working-directory: dbt_olist
         env:
           DBT_PROFILES_DIR: .
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: dbt build --exclude source:bronze
+        run: dbt run
 
-      - name: dbt snapshot
+      - name: dbt test (validate all models)
+        working-directory: dbt_olist
+        env:
+          DBT_PROFILES_DIR: .
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: dbt test
+
+      - name: dbt snapshot (SCD2 history)
         working-directory: dbt_olist
         env:
           DBT_PROFILES_DIR: .
