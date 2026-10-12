@@ -30,15 +30,6 @@ models:
       +schema: marts
 
 # Snapshot configurations
-models:
-  dbt_olist:
-    staging:
-      +materialized: view
-      +schema: staging
-    marts:
-      +materialized: table
-      +schema: marts
-
 snapshots:
   dbt_olist:
     +target_schema: snapshots
