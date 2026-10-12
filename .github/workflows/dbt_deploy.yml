@@ -24,38 +24,47 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-databricks==1.8.4
 
+      - name: Write profiles.yml from secrets
+        working-directory: dbt_olist
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          cat > profiles.yml <<EOF
+          dbt_olist:
+            target: dev
+            outputs:
+              dev:
+                type: databricks
+                catalog: olist
+                schema: dev
+                host: "${DATABRICKS_HOST}"
+                http_path: "${DATABRICKS_HTTP_PATH}"
+                token: "${DATABRICKS_TOKEN}"
+                threads: 4
+          EOF
+
       - name: dbt deps
         working-directory: dbt_olist
         env:
           DBT_PROFILES_DIR: .
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: dbt deps
 
       - name: dbt run (build all models)
         working-directory: dbt_olist
         env:
           DBT_PROFILES_DIR: .
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: dbt run
 
       - name: dbt test (validate all models)
         working-directory: dbt_olist
         env:
           DBT_PROFILES_DIR: .
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: dbt test
 
       - name: dbt snapshot (SCD2 history)
         working-directory: dbt_olist
         env:
           DBT_PROFILES_DIR: .
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: dbt snapshot
