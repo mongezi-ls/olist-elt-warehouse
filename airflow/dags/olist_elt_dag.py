@@ -1,9 +1,15 @@
 """
 Olist ELT pipeline — daily orchestration.
 
+Flow:
+  extract_mssql_to_bronze -> extract_api_to_bronze -> dbt_run_staging
+    -> dbt_test_staging -> dbt_run_marts -> dbt_test_marts
+    -> dbt_snapshot -> notify_success
+
+Extraction uses Parquet + COPY INTO (~8 min for 1.33M rows).
+dbt runs on Databricks SQL Warehouse (fast, native SQL execution).
 """
 from datetime import datetime, timedelta
-from pathlib import Path
 
 from airflow import DAG
 from airflow.operators.bash import BashOperator
@@ -29,7 +35,7 @@ default_args = {
 
 with DAG(
     dag_id="olist_elt_pipeline",
-    description="End-to-end ELT: MSSQL + API → bronze → dbt staging → marts → snapshots",
+    description="End-to-end ELT: MSSQL + API -> bronze -> dbt staging -> marts -> snapshots",
     start_date=datetime(2024, 1, 1),
     schedule="0 3 * * *",  # daily at 03:00 UTC
     catchup=False,
@@ -39,15 +45,15 @@ with DAG(
 ) as dag:
 
     # ------------------------------------------------------------------
-    # 1. Extraction — MSSQL → Databricks bronze
+    # 1. Extraction — MSSQL -> Databricks bronze (Parquet + COPY INTO)
     # ------------------------------------------------------------------
     extract_mssql = BashOperator(
         task_id="extract_mssql_to_bronze",
-        bash_command=f"python {INGESTION_DIR}/mssql_to_bronze.py",
+        bash_command=f"python {INGESTION_DIR}/mssql_to_bronze_v2.py",
     )
 
     # ------------------------------------------------------------------
-    # 2. Extraction — REST API → Databricks bronze (runs in parallel)
+    # 2. Extraction — REST API -> Databricks bronze
     # ------------------------------------------------------------------
     extract_api = BashOperator(
         task_id="extract_api_to_bronze",
@@ -101,7 +107,6 @@ with DAG(
         run_id = context["run_id"]
         dag_id = context["dag"].dag_id
         print(f"[NOTIFY] Pipeline succeeded. dag_id={dag_id} run_id={run_id}")
-        # In production: post to Slack, send email, etc.
 
     notify_success = PythonOperator(
         task_id="notify_success",
@@ -109,9 +114,9 @@ with DAG(
     )
 
     # ------------------------------------------------------------------
-    # Dependencies
+    # Dependencies (sequential — MSSQL first, then API, then dbt chain)
     # ------------------------------------------------------------------
-    [extract_mssql, extract_api] >> dbt_run_staging
+    extract_mssql >> extract_api >> dbt_run_staging
     dbt_run_staging >> dbt_test_staging
     dbt_test_staging >> dbt_run_marts
     dbt_run_marts >> dbt_test_marts
